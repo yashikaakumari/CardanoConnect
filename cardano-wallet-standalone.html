@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardano Wallet - RanchiMall</title>
+    <meta name="description" content="Professional Cardano blockchain wallet with cross-chain FLO private key compatibility">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <style>
+        :root {
+            --cardano: #1F47D4;
+            --cardano-light: #3F7CFF;
+            --gray-50: #FAFAFA;
+            --gray-100: #F4F4F5;
+            --gray-200: #E4E4E7;
+            --gray-300: #D4D4D8;
+            --gray-400: #A1A1AA;
+            --gray-500: #71717A;
+            --gray-600: #52525B;
+            --gray-700: #3F3F46;
+            --gray-750: #363640;
+            --gray-800: #27272A;
+            --gray-900: #18181B;
+            --indigo-400: #818CF8;
+            --indigo-500: #6366F1;
+            --indigo-600: #4F46E5;
+            --indigo-700: #4338CA;
+            --emerald-400: #34D399;
+            --emerald-600: #059669;
+            --emerald-100: #DCFCE7;
+            --teal-600: #0D9488;
+            --amber-600: #D97706;
+            --purple-600: #9333EA;
+            --red-400: #F87171;
+            --red-600: #DC2626;
+            --green-400: #4ADE80;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: var(--gray-900);
+            color: #F4F4F5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bg-cardano { background-color: var(--cardano); }
+        .bg-cardano-light { background-color: var(--cardano-light); }
+        .text-cardano { color: var(--cardano); }
+        .border-cardano { border-color: var(--cardano); }
+        .bg-gray-750 { background-color: var(--gray-750); }
+        
+        .font-mono { font-family: "JetBrains Mono", monospace; }
+        
+        .gradient-cardano {
+            background: linear-gradient(135deg, var(--indigo-600), var(--purple-600));
+        }
+        
+        .gradient-flo {
+            background: linear-gradient(135deg, var(--emerald-600), var(--teal-600));
+        }
+        
+        .address-text {
+            font-family: "JetBrains Mono", monospace;
+            font-size: 0.875rem;
+            word-break: break-all;
+            line-height: 1.4;
+        }
+        
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+            background-color: rgba(0, 0, 0, 0.75);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--gray-800); }
+        ::-webkit-scrollbar-thumb { background: var(--gray-600); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
+        
+        /* Loading animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .fa-spin { animation: spin 1s linear infinite; }
+        
+        /* Toast styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            border-radius: 8px;
+            padding: 16px;
+            z-index: 1000;
+            min-width: 300px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .toast.success { border-left: 4px solid var(--emerald-400); }
+        .toast.error { border-left: 4px solid var(--red-400); }
+        
+        /* Button styles */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--indigo-600);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--indigo-700);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray-700);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--gray-600);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Input styles */
+        .input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gray-600);
+            border-radius: 6px;
+            background-color: var(--gray-900);
+            color: white;
+            font-size: 14px;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: var(--indigo-500);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        
+        .modal-content {
+            background: var(--gray-800);
+            border: 1px solid var(--gray-700);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        /* Utility classes */
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-6 > * + * { margin-top: 1.5rem; }
+        .space-x-2 > * + * { margin-left: 0.5rem; }
+        .space-x-4 > * + * { margin-left: 1rem; }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .min-h-screen { min-height: 100vh; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mr-3 { margin-right: 0.75rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .font-medium { font-weight: 500; }
+        .text-white { color: white; }
+        .text-gray-400 { color: var(--gray-400); }
+        .text-gray-300 { color: var(--gray-300); }
+        .text-emerald-400 { color: var(--emerald-400); }
+        .text-red-400 { color: var(--red-400); }
+        .bg-gray-800 { background-color: var(--gray-800); }
+        .bg-gray-900 { background-color: var(--gray-900); }
+        .border { border-width: 1px; }
+        .border-gray-700 { border-color: var(--gray-700); }
+        .border-gray-600 { border-color: var(--gray-600); }
+        .rounded-lg { border-radius: 8px; }
+        .rounded-xl { border-radius: 12px; }
+        .cursor-pointer { cursor: pointer; }
+        .transition-colors { transition: color 0.2s, background-color 0.2s; }
+        .hover\:bg-gray-700:hover { background-color: var(--gray-700); }
+        .hover\:text-white:hover { color: white; }
+        .hover\:text-indigo-400:hover { color: var(--indigo-400); }
+        
+        @media (min-width: 1024px) {
+            .lg\:hidden { display: none; }
+            .lg\:translate-x-0 { transform: translateX(0); }
+            .lg\:static { position: static; }
+        }
+        
+        @media (max-width: 1023px) {
+            .translate-x-0 { transform: translateX(0); }
+            .-translate-x-full { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        // Mock data and services
+        const mockWallets = [
+            {
+                id: '1',
+                name: 'Main Wallet',
+                cardanoAddress: 'addr1qxy2lpdps2kk2hdc5r5rn7j5c2ljjtk72y2d2pxhg4f8rqvw7ldqg2gqvsj',
+                floAddress: 'FLo4bVzwpKNaMCMFdCPrcdDyWBCvszaX7w',
+                balance: '1247.850000',
+                balanceUSD: '312.50',
+                assets: []
+            }
+        ];
+
+        const mockTransactions = [
+            {
+                id: '1',
+                txHash: 'a4c2b7f8e9d1c3a5b6e8f7d9c2a4b6e8f7d9c2a4b6e8f7d9',
+                type: 'receive',
+                amount: '500000000',
+                fromAddress: 'addr1qx23...',
+                toAddress: 'addr1qxy2...',
+                status: 'confirmed',
+                timestamp: new Date(Date.now() - 3600000),
+                blockHeight: '8745632'
+            },
+            {
+                id: '2',
+                txHash: 'b7f8e9d1c3a5b6e8f7d9c2a4b6e8f7d9c2a4b6e8f7d9c2a4',
+                type: 'send',
+                amount: '100000000',
+                fromAddress: 'addr1qxy2...',
+                toAddress: 'addr1qz89...',
+                status: 'confirmed',
+                timestamp: new Date(Date.now() - 7200000),
+                blockHeight: '8745620'
+            }
+        ];
+
+        // Toast Component
+        function Toast({ message, type, onClose }) {
+            useEffect(() => {
+                const timer = setTimeout(onClose, 5000);
+                return () => clearTimeout(timer);
+            }, [onClose]);
+
+            return (
+                <div className={`toast ${type}`}>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div className="font-medium text-white">{type === 'success' ? 'Success' : 'Error'}</div>
+                            <div className="text-sm text-gray-300">{message}</div>
+                        </div>
+                        <button onClick={onClose} className="text-gray-400 hover:text-white">
+                            <i className="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Sidebar Component
+        function Sidebar({ currentWallet, isOpen, onClose, onNavigate, activeSection }) {
+            const navItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home' },
+                { id: 'send', label: 'Send', icon: 'fas fa-paper-plane' },
+                { id: 'receive', label: 'Receive', icon: 'fas fa-download' },
+                { id: 'history', label: 'History', icon: 'fas fa-history' },
+                { id: 'explorer', label: 'Explorer', icon: 'fas fa-search' },
+                { id: 'import', label: 'Import/Export', icon: 'fas fa-key' },
+                { id: 'settings', label: 'Settings', icon: 'fas fa-cog' },
+            ];
+
+            return (
+                <>
+                    {/* Mobile Overlay */}
+                    {isOpen && (
+                        <div 
+                            className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+                            onClick={onClose}
+                        />
+                    )}
+
+                    {/* Sidebar */}
+                    <div 
+                        className={`bg-gray-800 w-64 min-h-screen p-4 border-r border-gray-700 transition-transform duration-300 ease-in-out lg:translate-x-0 fixed lg:static z-30 ${
+                            isOpen ? "translate-x-0" : "-translate-x-full"
+                        }`}
+                    >
+                        {/* Logo and Brand */}
+                        <div className="flex items-center mb-8">
+                            <div className="w-10 h-10 gradient-cardano rounded-xl flex items-center justify-center mr-3">
+                                <i className="fas fa-wallet text-white text-lg"></i>
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold text-white">Cardano Wallet</h1>
+                                <p className="text-xs text-gray-400">RanchiMall</p>
+                            </div>
+                        </div>
+
+                        {/* Wallet Summary */}
+                        <div className="gradient-cardano rounded-xl p-4 mb-6">
+                            <div className="text-sm text-indigo-100 mb-1">Total Balance</div>
+                            <div className="text-2xl font-bold text-white">
+                                {currentWallet ? `${parseFloat(currentWallet.balance || '0').toFixed(2)} ₳` : '0.00 ₳'}
+                            </div>
+                            <div className="text-xs text-indigo-200 mt-2">
+                                ≈ ${currentWallet?.balanceUSD || '0.00'} USD
+                            </div>
+                        </div>
+
+                        {/* Navigation Menu */}
+                        <nav className="space-y-2">
+                            {navItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => onNavigate(item.id)}
+                                    className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors ${
+                                        activeSection === item.id
+                                            ? "bg-indigo-600 text-white"
+                                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                                    }`}
+                                >
+                                    <i className={`${item.icon} w-5 h-5 mr-3`}></i>
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+
+                        {/* FLO Compatibility Badge */}
+                        <div className="mt-6 p-3 gradient-flo rounded-lg">
+                            <div className="flex items-center">
+                                <i className="fas fa-link text-white mr-2"></i>
+                                <span className="text-xs font-medium text-white">FLO Compatible</span>
+                            </div>
+                            <div className="text-xs text-emerald-100 mt-1">Cross-chain enabled</div>
+                        </div>
+                    </div>
+                </>
+            );
+        }
+
+        // Quick Actions Component
+        function QuickActions({ onSendClick, onReceiveClick, onImportFLOClick, onNewWalletClick }) {
+            const actions = [
+                {
+                    title: 'Send ADA',
+                    description: 'Transfer to any address',
+                    icon: 'fas fa-paper-plane',
+                    bgColor: 'bg-indigo-600',
+                    onClick: onSendClick
+                },
+                {
+                    title: 'Receive',
+                    description: 'Get your address',
+                    icon: 'fas fa-download',
+                    bgColor: 'bg-green-600',
+                    onClick: onReceiveClick
+                },
+                {
+                    title: 'Import FLO',
+                    description: 'Use FLO private key',
+                    icon: 'fas fa-key',
+                    bgColor: 'bg-amber-600',
+                    onClick: onImportFLOClick
+                },
+                {
+                    title: 'New Wallet',
+                    description: 'Generate new address',
+                    icon: 'fas fa-plus',
+                    bgColor: 'bg-purple-600',
+                    onClick: onNewWalletClick
+                }
+            ];
+
+            return (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    {actions.map((action, index) => (
+                        <button
+                            key={index}
+                            onClick={action.onClick}
+                            className="bg-gray-800 hover:bg-gray-750 border border-gray-700 rounded-xl p-6 text-center transition-all duration-200 hover:scale-105"
+                        >
+                            <div className={`w-12 h-12 ${action.bgColor} rounded-xl flex items-center justify-center mx-auto mb-3`}>
+                                <i className={`${action.icon} text-white text-xl`}></i>
+                            </div>
+                            <h3 className="font-semibold text-white mb-1">{action.title}</h3>
+                            <p className="text-xs text-gray-400">{action.description}</p>
+                        </button>
+                    ))}
+                </div>
+            );
+        }
+
+        // Assets List Component
+        function AssetsList({ assets, adaBalance, adaBalanceUSD }) {
+            return (
+                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-white">Assets</h3>
+                        <button className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
+                            View All
+                        </button>
+                    </div>
+                    
+                    {/* ADA Balance */}
+                    <div className="flex items-center justify-between py-4 border-b border-gray-700">
+                        <div className="flex items-center">
+                            <div className="w-12 h-12 bg-cardano rounded-xl flex items-center justify-center mr-4">
+                                <span className="text-white font-bold text-lg">₳</span>
+                            </div>
+                            <div>
+                                <h4 className="font-medium text-white">Cardano</h4>
+                                <p className="text-sm text-gray-400">ADA</p>
+                            </div>
+                        </div>
+                        <div className="text-right">
+                            <div className="font-semibold text-white">
+                                {parseFloat(adaBalance || '0').toFixed(2)} ₳
+                            </div>
+                            <div className="text-sm text-gray-400">
+                                ${adaBalanceUSD || '0.00'}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Native Tokens */}
+                    {assets.map((asset, index) => (
+                        <div 
+                            key={asset.id} 
+                            className="flex items-center justify-between py-4 border-b border-gray-700 last:border-b-0"
+                        >
+                            <div className="flex items-center">
+                                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mr-4">
+                                    <span className="text-white font-bold text-sm">
+                                        {asset.symbol?.slice(0, 3) || 'TKN'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h4 className="font-medium text-white">
+                                        {asset.displayName || asset.assetName}
+                                    </h4>
+                                    <p className="text-sm text-gray-400">
+                                        {asset.symbol}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <div className="font-semibold text-white">
+                                    {parseFloat(asset.balance || '0').toFixed(asset.decimals || 0)} {asset.symbol}
+                                </div>
+                                <div className="text-sm text-gray-400">
+                                    ${asset.usdValue || '0.00'}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Empty state */}
+                    {assets.length === 0 && (
+                        <div className="text-center py-8 text-gray-400">
+                            <i className="fas fa-coins text-4xl mb-4"></i>
+                            <p>No native tokens found</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Transactions List Component
+        function TransactionsList({ transactions }) {
+            const getTransactionIcon = (type) => {
+                switch (type) {
+                    case 'receive':
+                        return { icon: 'fas fa-arrow-down', color: 'bg-emerald-600' };
+                    case 'send':
+                        return { icon: 'fas fa-arrow-up', color: 'bg-red-600' };
+                    default:
+                        return { icon: 'fas fa-exchange-alt', color: 'bg-gray-600' };
+                }
+            };
+
+            const getAmountColor = (type) => {
+                switch (type) {
+                    case 'receive':
+                        return 'text-emerald-400';
+                    case 'send':
+                        return 'text-red-400';
+                    default:
+                        return 'text-purple-400';
+                }
+            };
+
+            const formatAmount = (amount, type) => {
+                const ada = parseFloat(amount) / 1000000;
+                const prefix = type === 'receive' ? '+' : type === 'send' ? '-' : '';
+                return `${prefix}${ada.toFixed(2)} ₳`;
+            };
+
+            const formatTime = (timestamp) => {
+                const now = new Date();
+                const diff = now - new Date(timestamp);
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+                if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                return 'Just now';
+            };
+
+            return (
+                <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-white">Recent Transactions</h3>
+                        <button className="text-indigo-400 hover:text-indigo-300 text-sm font-medium">
+                            View All
+                        </button>
+                    </div>
+
+                    {/* Transaction List */}
+                    <div className="space-y-0">
+                        {transactions.map((transaction, index) => {
+                            const iconConfig = getTransactionIcon(transaction.type);
+                            const amountColor = getAmountColor(transaction.type);
+                            
+                            return (
+                                <div 
+                                    key={transaction.id} 
+                                    className="flex items-center justify-between py-4 border-b border-gray-700 last:border-b-0"
+                                >
+                                    <div className="flex items-center">
+                                        <div className={`w-10 h-10 ${iconConfig.color} rounded-xl flex items-center justify-center mr-4`}>
+                                            <i className={`${iconConfig.icon} text-white`}></i>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-medium text-white capitalize">
+                                                {transaction.type}
+                                            </h4>
+                                            <p className="text-sm text-gray-400 font-mono">
+                                                {transaction.txHash.slice(0, 8)}...{transaction.txHash.slice(-4)}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className={`font-semibold ${amountColor}`}>
+                                            {formatAmount(transaction.amount, transaction.type)}
+                                        </div>
+                                        <div className="text-sm text-gray-400">
+                                            {formatTime(transaction.timestamp)}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Empty state */}
+                    {transactions.length === 0 && (
+                        <div className="text-center py-8 text-gray-400">
+                            <i className="fas fa-history text-4xl mb-4"></i>
+                            <p>No transactions found</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Wallet Info Component
+        function WalletInfo({ wallet }) {
+            const [showQR, setShowQR] = useState(false);
+
+            const copyToClipboard = async (text, label) => {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    // Show success message
+                    console.log(`${label} copied to clipboard`);
+                } catch (error) {
+                    console.error('Failed to copy to clipboard');
+                }
+            };
+
+            if (!wallet) {
+                return (
+                    <div className="space-y-6">
+                        <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                            <div className="text-center text-gray-400 py-8">
+                                <i className="fas fa-wallet text-4xl mb-4"></i>
+                                <p>No wallet selected</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="space-y-6">
+                    {/* Current Address */}
+                    <div className="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h3 className="text-lg font-semibold text-white mb-4">Current Address</h3>
+                        <div className="bg-gray-900 border border-gray-600 rounded-lg p-4 mb-4">
+                            <div className="text-xs text-gray-400 mb-2">Receive Address</div>
+                            <div 
+                                className="font-mono text-sm text-white break-all cursor-pointer hover:text-indigo-400 transition-colors"
+                                onClick={() => copyToClipboard(wallet.cardanoAddress, 'Address')}
+                            >
+                                {wallet.cardanoAddress}
+                            </div>
+                        </div>
+                        <div className="flex space-x-2">
+                            <button 
+                                onClick={() => copyToClipboard(wallet.cardanoAddress, 'Address')}
+                                className="flex-1 btn btn-primary"
+                            >
+                                <i className="fas fa-copy mr-2"></i>Copy
+                            </button>
+                            <button 
+                                onClick={() => setShowQR(!showQR)}
+                                className="flex-1 btn btn-secondary"
+                            >
+                                <i className="fas fa-qrcode mr-2"></i>QR Code
+                            </button>
+                        </div>
+                        
+                        {/* QR Code Display */}
+                        {showQR && (
+                            <div className="mt-4 p-4 bg-white rounded-lg text-center">
+                                <div className="w-48 h-48 mx-auto bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-600">QR Code Placeholder</span>
+                                </div>
+                                <p className="text-xs text-gray-600 mt-2">Scan to get address</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* FLO Cross-Chain Status */}
+                    {wallet.floAddress && (
+                        <div className="gradient-flo border border-emerald-600 rounded-xl p-6">
+                            <div className="flex items-center mb-3">
+                                <i className="fas fa-link text-emerald-400 mr-2"></i>
+                                <h3 className="text-lg font-semibold text-white">FLO Integration</h3>
+                            </div>
+                            <p className="text-emerald-100 text-sm mb-4">
+                                Your FLO private key can manage this Cardano wallet
+                            </p>
+                            <div className="bg-emerald-900 border border-emerald-600 rounded-lg p-3">
+                                <div className="text-xs text-emerald-300 mb-1">FLO Address</div>
+                                <div 
+                                    className="font-mono text-sm text-emerald-100 break-all cursor-pointer hover:text-emerald-200 transition-colors"
+                                    onClick={() => copyToClipboard(wallet.floAddress, 'FLO Address')}
+                                >
+                                    {wallet.floAddress}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Send Modal Component
+        function SendModal({ isOpen, onClose, wallet, onSend }) {
+            const [recipientAddress, setRecipientAddress] = useState('');
+            const [amount, setAmount] = useState('');
+            const [isValidAddress, setIsValidAddress] = useState(true);
+            const [isSending, setIsSending] = useState(false);
+
+            const estimatedFee = '0.17'; // ADA
+
+            const validateAddress = (address) => {
+                const isValid = address.startsWith('addr1') && address.length > 50;
+                setIsValidAddress(isValid);
+                return isValid;
+            };
+
+            const handleAddressChange = (value) => {
+                setRecipientAddress(value);
+                if (value) {
+                    validateAddress(value);
+                } else {
+                    setIsValidAddress(true);
+                }
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                
+                if (!wallet || !recipientAddress || !amount || !isValidAddress) {
+                    return;
+                }
+
+                const amountNum = parseFloat(amount);
+                if (isNaN(amountNum) || amountNum <= 0) {
+                    return;
+                }
+
+                const walletBalance = parseFloat(wallet.balance);
+                if (amountNum + parseFloat(estimatedFee) > walletBalance) {
+                    alert('Insufficient balance');
+                    return;
+                }
+
+                setIsSending(true);
+                
+                // Simulate transaction
+                setTimeout(() => {
+                    onSend({
+                        toAddress: recipientAddress,
+                        amount: amount,
+                        fee: estimatedFee
+                    });
+                    setIsSending(false);
+                    onClose();
+                    setRecipientAddress('');
+                    setAmount('');
+                }, 2000);
+            };
+
+            const handleClose = () => {
+                onClose();
+                setRecipientAddress('');
+                setAmount('');
+                setIsValidAddress(true);
+            };
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="modal modal-backdrop">
+                    <div className="modal-content">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-semibold text-white">Send ADA</h2>
+                            <button onClick={handleClose} className="text-gray-400 hover:text-white">
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block text-gray-300 mb-2">Recipient Address</label>
+                                <input
+                                    type="text"
+                                    value={recipientAddress}
+                                    onChange={(e) => handleAddressChange(e.target.value)}
+                                    className={`input font-mono text-sm ${
+                                        !isValidAddress ? 'border-red-500' : ''
+                                    }`}
+                                    placeholder="addr1qxy2lpdps2kk2hdc5r5rn7j5c2ljjtk..."
+                                />
+                                {!isValidAddress && (
+                                    <p className="text-red-400 text-sm mt-1">Invalid Cardano address</p>
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-300 mb-2">Amount</label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        className="input pr-12"
+                                        placeholder="0.00"
+                                    />
+                                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                        ₳
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-gray-300 mb-2">Transaction Fee</label>
+                                <div className="bg-gray-900 border border-gray-600 rounded-lg px-4 py-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-gray-400">Network Fee</span>
+                                        <span className="text-white font-medium">
+                                            {estimatedFee} ₳
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Balance Info */}
+                            {wallet && (
+                                <div className="bg-gray-900 border border-gray-600 rounded-lg px-4 py-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-gray-400">Available Balance</span>
+                                        <span className="text-white font-medium">
+                                            {parseFloat(wallet.balance).toFixed(2)} ₳
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="flex space-x-3">
+                                <button
+                                    type="button"
+                                    onClick={handleClose}
+                                    className="flex-1 btn btn-secondary"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isSending || !recipientAddress || !amount || !isValidAddress}
+                                    className="flex-1 btn btn-primary"
+                                >
+                                    {isSending ? (
+                                        <>
+                                            <i className="fas fa-spinner fa-spin mr-2"></i>
+                                            Sending...
+                                        </>
+                                    ) : (
+                                        'Send Transaction'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // Explorer Modal Component
+        function ExplorerModal({ isOpen, onClose }) {
+            const [searchAddress, setSearchAddress] = useState('');
+            const [searchResults, setSearchResults] = useState([]);
+            const [isSearching, setIsSearching] = useState(false);
+            const [hasSearched, setHasSearched] = useState(false);
+
+            const handleSearch = async (e) => {
+                e.preventDefault();
+                
+                if (!searchAddress.trim()) {
+                    alert('Please enter an address to search');
+                    return;
+                }
+
+                setIsSearching(true);
+                setHasSearched(true);
+                
+                // Simulate search
+                setTimeout(() => {
+                    // Use mock transactions for demonstration
+                    setSearchResults(mockTransactions);
+                    setIsSearching(false);
+                }, 1500);
+            };
+
+            const handleClose = () => {
+                onClose();
+                setSearchAddress('');
+                setSearchResults([]);
+                setHasSearched(false);
+            };
+
+            const formatAmount = (amount, type) => {
+                const ada = parseFloat(amount) / 1000000;
+                const prefix = type === 'receive' ? '+' : type === 'send' ? '-' : '';
+                return `${prefix}${ada.toFixed(2)} ₳`;
+            };
+
+            const formatTime = (timestamp) => {
+                const now = new Date();
+                const diff = now - new Date(timestamp);
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+                if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                return 'Just now';
+            };
+
+            const getTransactionIcon = (type) => {
+                switch (type) {
+                    case 'receive':
+                        return { icon: 'fas fa-arrow-down', color: 'text-emerald-400' };
+                    case 'send':
+                        return { icon: 'fas fa-arrow-up', color: 'text-red-400' };
+                    default:
+                        return { icon: 'fas fa-exchange-alt', color: 'text-purple-400' };
+                }
+            };
+
+            if (!isOpen) return null;
+
+            return (
+                <div className="modal modal-backdrop">
+                    <div className="modal-content" style={{maxWidth: '600px'}}>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-semibold text-white">Address Explorer</h2>
+                            <button onClick={handleClose} className="text-gray-400 hover:text-white">
+                                <i className="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <div className="space-y-6">
+                            <form onSubmit={handleSearch} className="space-y-4">
+                                <div>
+                                    <label className="block text-gray-300 mb-2">Search Address</label>
+                                    <div className="flex space-x-2">
+                                        <input
+                                            type="text"
+                                            value={searchAddress}
+                                            onChange={(e) => setSearchAddress(e.target.value)}
+                                            className="flex-1 input font-mono text-sm"
+                                            placeholder="Enter Cardano address..."
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={isSearching}
+                                            className="btn btn-primary"
+                                        >
+                                            {isSearching ? (
+                                                <i className="fas fa-spinner fa-spin"></i>
+                                            ) : (
+                                                <i className="fas fa-search"></i>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            {/* Search Results */}
+                            <div className="bg-gray-900 border border-gray-600 rounded-lg p-4" style={{minHeight: '200px'}}>
+                                {!hasSearched ? (
+                                    <div className="text-center text-gray-400 py-8">
+                                        <i className="fas fa-search text-4xl mb-4"></i>
+                                        <p>Enter an address to view its transaction history</p>
+                                    </div>
+                                ) : isSearching ? (
+                                    <div className="text-center text-gray-400 py-8">
+                                        <i className="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                                        <p>Searching transactions...</p>
+                                    </div>
+                                ) : searchResults.length === 0 ? (
+                                    <div className="text-center text-gray-400 py-8">
+                                        <i className="fas fa-inbox text-4xl mb-4"></i>
+                                        <p>No transactions found for this address</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-0">
+                                        <h4 className="text-white font-medium mb-4">
+                                            Transaction History ({searchResults.length})
+                                        </h4>
+                                        {searchResults.map((transaction, index) => {
+                                            const iconConfig = getTransactionIcon(transaction.type);
+                                            
+                                            return (
+                                                <div 
+                                                    key={transaction.id}
+                                                    className="flex items-center justify-between py-3 border-b border-gray-700 last:border-b-0"
+                                                >
+                                                    <div className="flex items-center">
+                                                        <div className="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center mr-3">
+                                                            <i className={`${iconConfig.icon} ${iconConfig.color} text-sm`}></i>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-white text-sm font-medium capitalize">
+                                                                {transaction.type}
+                                                            </div>
+                                                            <div className="text-xs text-gray-400 font-mono">
+                                                                {transaction.txHash.slice(0, 12)}...{transaction.txHash.slice(-6)}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className={`text-sm font-medium ${iconConfig.color}`}>
+                                                            {formatAmount(transaction.amount, transaction.type)}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">
+                                                            {formatTime(transaction.timestamp)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Main Dashboard Component
+        function Dashboard() {
+            const [sidebarOpen, setSidebarOpen] = useState(false);
+            const [activeSection, setActiveSection] = useState('dashboard');
+            const [showSendModal, setShowSendModal] = useState(false);
+            const [showExplorerModal, setShowExplorerModal] = useState(false);
+            const [currentWallet, setCurrentWallet] = useState(mockWallets[0]);
+            const [transactions, setTransactions] = useState(mockTransactions);
+            const [toast, setToast] = useState(null);
+
+            const showToast = (message, type = 'success') => {
+                setToast({ message, type });
+            };
+
+            const handleNavigate = (section) => {
+                setActiveSection(section);
+                setSidebarOpen(false);
+                
+                switch (section) {
+                    case 'send':
+                        setShowSendModal(true);
+                        break;
+                    case 'explorer':
+                        setShowExplorerModal(true);
+                        break;
+                }
+            };
+
+            const handleNewWallet = () => {
+                const newWallet = {
+                    id: String(Date.now()),
+                    name: `Wallet ${Date.now()}`,
+                    cardanoAddress: `addr1qxy${Date.now().toString().slice(-50)}`,
+                    balance: '0.000000',
+                    balanceUSD: '0.00',
+                    assets: []
+                };
+                setCurrentWallet(newWallet);
+                showToast('New wallet generated successfully');
+            };
+
+            const handleImportFLO = () => {
+                const floPrivateKey = prompt('Enter your FLO private key:');
+                if (floPrivateKey && floPrivateKey.length > 20) {
+                    const importedWallet = {
+                        id: String(Date.now()),
+                        name: 'FLO Imported Wallet',
+                        cardanoAddress: `addr1qxy${Date.now().toString().slice(-50)}`,
+                        floAddress: `FLo${Date.now().toString().slice(-30)}`,
+                        balance: '0.000000',
+                        balanceUSD: '0.00',
+                        assets: []
+                    };
+                    setCurrentWallet(importedWallet);
+                    showToast('FLO private key imported successfully');
+                } else if (floPrivateKey !== null) {
+                    showToast('Invalid FLO private key format', 'error');
+                }
+            };
+
+            const handleSendTransaction = (txData) => {
+                const newTransaction = {
+                    id: String(Date.now()),
+                    txHash: `tx_${Date.now().toString(16)}`,
+                    type: 'send',
+                    amount: String(parseFloat(txData.amount) * 1000000),
+                    fromAddress: currentWallet.cardanoAddress,
+                    toAddress: txData.toAddress,
+                    status: 'pending',
+                    timestamp: new Date(),
+                    blockHeight: String(8745000 + Math.floor(Math.random() * 1000))
+                };
+                
+                setTransactions(prev => [newTransaction, ...prev]);
+                
+                // Update wallet balance
+                const newBalance = parseFloat(currentWallet.balance) - parseFloat(txData.amount) - parseFloat(txData.fee);
+                setCurrentWallet(prev => ({
+                    ...prev,
+                    balance: newBalance.toFixed(6),
+                    balanceUSD: (newBalance * 0.25).toFixed(2)
+                }));
+                
+                showToast('Transaction submitted successfully');
+            };
+
+            return (
+                <div className="flex h-screen overflow-hidden bg-gray-900 text-gray-100">
+                    <Sidebar
+                        currentWallet={currentWallet}
+                        isOpen={sidebarOpen}
+                        onClose={() => setSidebarOpen(false)}
+                        onNavigate={handleNavigate}
+                        activeSection={activeSection}
+                    />
+
+                    {/* Main Content */}
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                        {/* Top Header */}
+                        <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <button
+                                        onClick={() => setSidebarOpen(true)}
+                                        className="lg:hidden mr-4 text-gray-400 hover:text-white"
+                                    >
+                                        <i className="fas fa-bars text-xl"></i>
+                                    </button>
+                                    <h2 className="text-xl font-semibold text-white">Dashboard</h2>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <div className="flex items-center text-sm text-gray-400">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                                        Mainnet Connected
+                                    </div>
+                                    <button className="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700 transition-colors">
+                                        <i className="fas fa-bell text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </header>
+
+                        {/* Main Content Area */}
+                        <main className="flex-1 overflow-auto p-6">
+                            {/* Quick Actions */}
+                            <QuickActions
+                                onSendClick={() => setShowSendModal(true)}
+                                onReceiveClick={() => setActiveSection('receive')}
+                                onImportFLOClick={handleImportFLO}
+                                onNewWalletClick={handleNewWallet}
+                            />
+
+                            {/* Assets and Wallet Info */}
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                {/* Assets */}
+                                <div className="lg:col-span-2">
+                                    <AssetsList
+                                        assets={currentWallet?.assets || []}
+                                        adaBalance={currentWallet?.balance || '0'}
+                                        adaBalanceUSD={currentWallet?.balanceUSD || '0.00'}
+                                    />
+                                </div>
+
+                                {/* Wallet Info */}
+                                <div>
+                                    <WalletInfo wallet={currentWallet} />
+                                </div>
+                            </div>
+
+                            {/* Recent Transactions */}
+                            <TransactionsList transactions={transactions} />
+                        </main>
+                    </div>
+
+                    {/* Modals */}
+                    <SendModal
+                        isOpen={showSendModal}
+                        onClose={() => setShowSendModal(false)}
+                        wallet={currentWallet}
+                        onSend={handleSendTransaction}
+                    />
+
+                    <ExplorerModal
+                        isOpen={showExplorerModal}
+                        onClose={() => setShowExplorerModal(false)}
+                    />
+
+                    {/* Toast */}
+                    {toast && (
+                        <Toast
+                            message={toast.message}
+                            type={toast.type}
+                            onClose={() => setToast(null)}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>
