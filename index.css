@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(222, 84%, 4.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222, 84%, 4.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(222, 84%, 4.9%);
+  --primary: hsl(222, 47.4%, 11.2%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(222, 47.4%, 11.2%);
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(215, 16%, 46.9%);
+  --accent: hsl(210, 40%, 96%);
+  --accent-foreground: hsl(222, 47.4%, 11.2%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --border: hsl(214, 31.8%, 91.4%);
+  --input: hsl(214, 31.8%, 91.4%);
+  --ring: hsl(222, 84%, 4.9%);
+  --chart-1: hsl(12, 76%, 61%);
+  --chart-2: hsl(173, 58%, 39%);
+  --chart-3: hsl(197, 37%, 24%);
+  --chart-4: hsl(43, 74%, 66%);
+  --chart-5: hsl(27, 87%, 67%);
+  --radius: 0.5rem;
+  
+  /* Cardano Wallet Custom Colors */
+  --cardano: hsl(223, 100%, 34%);
+  --cardano-light: hsl(223, 63%, 50%);
+  --gray-50: hsl(210, 20%, 98%);
+  --gray-100: hsl(220, 14.3%, 95.9%);
+  --gray-200: hsl(220, 13%, 91%);
+  --gray-300: hsl(216, 12.2%, 83.9%);
+  --gray-400: hsl(218, 10.6%, 64.9%);
+  --gray-500: hsl(220, 8.9%, 46.1%);
+  --gray-600: hsl(215, 13.8%, 34.1%);
+  --gray-700: hsl(217, 19.1%, 26.7%);
+  --gray-750: hsl(217, 19.1%, 24%);
+  --gray-800: hsl(215, 27.9%, 16.9%);
+  --gray-900: hsl(222, 47.4%, 11.2%);
+  --indigo-400: hsl(234, 89%, 74%);
+  --indigo-500: hsl(231, 48%, 48%);
+  --indigo-600: hsl(232, 79%, 60%);
+  --indigo-700: hsl(230, 76%, 56%);
+  --emerald-400: hsl(158, 64%, 52%);
+  --emerald-600: hsl(158, 64%, 45%);
+  --emerald-100: hsl(154, 44%, 91%);
+  --teal-600: hsl(178, 100%, 29%);
+  --amber-600: hsl(37, 92%, 50%);
+  --purple-600: hsl(271, 91%, 65%);
+  --red-400: hsl(0, 84%, 72%);
+  --red-600: hsl(0, 84%, 60%);
+  --green-400: hsl(142, 76%, 36%);
+}
+
+.dark {
+  --background: hsl(222, 47.4%, 11.2%);
+  --foreground: hsl(210, 40%, 98%);
+  --card: hsl(215, 27.9%, 16.9%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --popover: hsl(222, 47.4%, 11.2%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --primary: hsl(210, 40%, 98%);
+  --primary-foreground: hsl(222, 47.4%, 11.2%);
+  --secondary: hsl(217, 32.6%, 17.5%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --muted: hsl(217, 32.6%, 17.5%);
+  --muted-foreground: hsl(215, 20.2%, 65.1%);
+  --accent: hsl(217, 32.6%, 17.5%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217, 32.6%, 17.5%);
+  --input: hsl(217, 32.6%, 17.5%);
+  --ring: hsl(212, 72%, 59%);
+  --chart-1: hsl(220, 70%, 50%);
+  --chart-2: hsl(160, 60%, 45%);
+  --chart-3: hsl(30, 80%, 55%);
+  --chart-4: hsl(280, 65%, 60%);
+  --chart-5: hsl(340, 75%, 55%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+}
+
+/* Cardano specific utilities */
+.bg-cardano {
+  background-color: var(--cardano);
+}
+
+.bg-cardano-light {
+  background-color: var(--cardano-light);
+}
+
+.text-cardano {
+  color: var(--cardano);
+}
+
+.border-cardano {
+  border-color: var(--cardano);
+}
+
+/* Gray scale utilities for dark theme */
+.bg-gray-750 {
+  background-color: var(--gray-750);
+}
+
+/* Font families */
+.font-mono {
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Hover effects for action cards */
+.action-card:hover {
+  transform: scale(1.02);
+}
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--gray-800);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gray-600);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-500);
+}
+
+/* Loading animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Gradient backgrounds */
+.gradient-cardano {
+  background: linear-gradient(135deg, var(--indigo-600), var(--purple-600));
+}
+
+.gradient-flo {
+  background: linear-gradient(135deg, var(--emerald-600), var(--teal-600));
+}
+
+/* Transaction status indicators */
+.status-pending {
+  color: var(--amber-600);
+}
+
+.status-confirmed {
+  color: var(--emerald-400);
+}
+
+.status-failed {
+  color: var(--red-400);
+}
+
+/* Address text styling */
+.address-text {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.875rem;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.75);
+}
